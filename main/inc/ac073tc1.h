@@ -28,9 +28,6 @@
 #define AC073TC1_POF 0x02
 #define AC073TC1_DTM 0x10
 
-#define WIDTH 800
-#define HEIGHT 480
-
 enum COLOR {
     BLACK = 0,
     WHITE = 1,
