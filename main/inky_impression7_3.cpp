@@ -8,12 +8,12 @@
 #include "inky_impression_params.h"
 
 
-DMA_ATTR uint8_t buffer[DISP_BUF_SIZE];
+DMA_ATTR uint8_t buffer[InkyImpression7_3f::BUF_SIZE];
 spi_device_handle_t inky;
-static COLOR borderColor;
+static InkyImpression7_3f::COLOR borderColor;
 
-void inky_set_pixel(uint x, uint y, COLOR color) {
-    uint index = ((y % DISP_HEIGHT) * DISP_WIDTH + (x % DISP_WIDTH)) / 2;
+void InkyImpression7_3f::set_pixel(uint x, uint y, InkyImpression7_3f::COLOR color) {
+    uint index = ((y % InkyImpression7_3f::HEIGHT) * InkyImpression7_3f::WIDTH + (x % InkyImpression7_3f::WIDTH)) / 2;
     if (x & 1) { buffer[index] = (buffer[index] & 0x70) | (color & 0x7); }
     else { buffer[index] = (buffer[index] & 0x7) | ((color << 4) & 0x70); }
 }
@@ -187,7 +187,7 @@ void hw_update() {
     busy_wait(400);
 }
 
-void inky_init_hw(void) {
+void InkyImpression7_3f::init_hw() {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wmissing-field-initializers"
     static const gpio_config_t gpioCfgOut = {
@@ -208,7 +208,7 @@ void inky_init_hw(void) {
     static const spi_bus_config_t buscfg = {
             .mosi_io_num = static_cast<gpio_num_t>(DISP_PIN_MOSI),
             .sclk_io_num = static_cast<gpio_num_t>(DISP_PIN_CLK),
-            .max_transfer_sz = DISP_BUF_SIZE,
+            .max_transfer_sz = InkyImpression7_3f::BUF_SIZE,
     };
     static const spi_device_interface_config_t devcfg = {
             .mode = 0,
@@ -240,19 +240,19 @@ void inky_init_hw(void) {
 /** Show buffer on display.
  *
  */
-void inky_show() {
+void InkyImpression7_3f::show() {
     inky_setup();
 
     send_command(AC073TC1_DTM);
-    for (size_t i = 0; i < DISP_BUF_SIZE; i += 1000)
+    for (size_t i = 0; i < InkyImpression7_3f::BUF_SIZE; i += 1000)
         send_data(buffer + i, 1000);
     hw_update();
 }
 
-void inky_set_border(COLOR color) {
+void InkyImpression7_3f::set_border(InkyImpression7_3f::COLOR color) {
     borderColor = color;
 }
 
-void inky_background(const uint8_t *packet_pixels) {
-    memcpy(buffer, packet_pixels, DISP_BUF_SIZE);
+void InkyImpression7_3f::set_background(const uint8_t *packet_pixels) {
+    memcpy(buffer, packet_pixels, InkyImpression7_3f::BUF_SIZE);
 }
