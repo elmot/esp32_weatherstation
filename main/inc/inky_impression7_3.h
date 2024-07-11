@@ -22,6 +22,7 @@ typedef enum {
 
 #define DISP_WIDTH 800
 #define DISP_HEIGHT 480
+#define DISP_BUF_SIZE (DISP_WIDTH * DISP_HEIGHT / 2)
 
     void inky_set_pixel(unsigned int x, unsigned int y, COLOR color);
     void inky_init_hw(void);

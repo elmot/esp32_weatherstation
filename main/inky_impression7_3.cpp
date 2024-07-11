@@ -7,7 +7,6 @@
 #include "inky_impression7_3.h"
 #include "inky_impression_params.h"
 
-#define DISP_BUF_SIZE     (DISP_HEIGHT * DISP_WIDTH / 2)
 
 DMA_ATTR uint8_t buffer[DISP_BUF_SIZE];
 spi_device_handle_t inky;
@@ -15,8 +14,8 @@ static COLOR borderColor;
 
 void inky_set_pixel(uint x, uint y, COLOR color) {
     uint index = ((y % DISP_HEIGHT) * DISP_WIDTH + (x % DISP_WIDTH)) / 2;
-    if (x & 1) { buffer[index] = (buffer[index] & 0x7) | ((color << 4) & 0x70); }
-    else { buffer[index] = (buffer[index] & 0x70) | (color & 0x7); }
+    if (x & 1) { buffer[index] = (buffer[index] & 0x70) | (color & 0x7); }
+    else { buffer[index] = (buffer[index] & 0x7) | ((color << 4) & 0x70); }
 }
 
 #define AC073TC1_CMDH 0xAA
@@ -241,7 +240,7 @@ void inky_init_hw(void) {
 /** Show buffer on display.
  *
  */
-extern "C" void inky_show() {
+void inky_show() {
     inky_setup();
 
     send_command(AC073TC1_DTM);
@@ -252,4 +251,8 @@ extern "C" void inky_show() {
 
 void inky_set_border(COLOR color) {
     borderColor = color;
+}
+
+void inky_background(const uint8_t *packet_pixels) {
+    memcpy(buffer, packet_pixels, DISP_BUF_SIZE);
 }
