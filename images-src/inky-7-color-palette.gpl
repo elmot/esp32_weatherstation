@@ -1,0 +1,10 @@
+GIMP Palette
+Name: InkyImpressions
+Columns: 7
+0 0 0 Index 0 # black
+236 248 255 Index 1 # white
+1 189 38 Index 2 # green
+13 23 226 Index 3 # blue
+250 40 17 Index 4 # red
+255 255 34 Index 5 # yellow
+247 130 22 Index 6 # orange
