@@ -1,0 +1,7 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="APP-FAST-FLASH" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="-f board/esp32c3-builtin.cfg -c &quot;program_esp $PROJECT_DIR$/build/esp32_weatherstation.bin 0x10000 verify reset exit&quot;" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$ProjectFileDir$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="esp32_weatherstation" TARGET_NAME="app" CONFIG_NAME="Debug-MinGW ESP-IDF" RUN_PATH="C:/Espressif/tools/openocd-esp32/v0.12.0-esp32-20230921/openocd-esp32/bin/openocd.exe">
+    <method v="2">
+      <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+    </method>
+  </configuration>
+</component>
