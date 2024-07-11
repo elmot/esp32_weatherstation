@@ -4,12 +4,15 @@
 
 #ifndef ESP32_WEATHERSTATION_INKY_IMPRESSION7_3_H
 #define ESP32_WEATHERSTATION_INKY_IMPRESSION7_3_H
-#ifdef __cplusplus
-extern "C" {
+#ifndef __cplusplus
+#error Only C++ issupported
 #endif
 
+#include <driver/spi_master.h>
 class InkyImpression7_3f {
 public :
+    InkyImpression7_3f();
+
     typedef enum {
         BLACK = 0,
         WHITE = 1,
@@ -24,17 +27,31 @@ public :
     static constexpr unsigned int WIDTH = 800;
     static constexpr unsigned int HEIGHT = 480;
     static constexpr size_t BUF_SIZE = (WIDTH * HEIGHT / 2);
-    static void set_pixel(unsigned int x, unsigned int y, COLOR color);
-    static void init_hw(void);
-    static void show(void);
-    static void set_border(COLOR);
-    static void set_background(const uint8_t *packet_pixels) ;
 
+    InkyImpression7_3f(COLOR borderColor, unsigned char *buffer);
+
+    void set_pixel(unsigned int x, unsigned int y, COLOR color);
+    void init_hw();
+    void show();
+    void set_border(COLOR);
+    void set_background(const uint8_t *packet_pixels) ;
+private:
+
+    spi_device_handle_t spi{};
+
+    COLOR borderColor = BLACK;
+
+    void setup();
+
+    unsigned char *buffer;
+
+    void spi_write(uint32_t dc, const uint8_t *values, size_t len);
+
+    void send_command(uint8_t command);
+
+    void send_data(const uint8_t *data, size_t len);
+
+    void hw_update();
 };
 
-
-
-#ifdef __cplusplus
-}
-#endif
 #endif //ESP32_WEATHERSTATION_INKY_IMPRESSION7_3_H

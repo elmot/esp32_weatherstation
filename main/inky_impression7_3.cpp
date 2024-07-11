@@ -8,10 +8,6 @@
 #include "inky_impression_params.h"
 
 
-DMA_ATTR uint8_t buffer[InkyImpression7_3f::BUF_SIZE];
-spi_device_handle_t inky;
-static InkyImpression7_3f::COLOR borderColor;
-
 void InkyImpression7_3f::set_pixel(uint x, uint y, InkyImpression7_3f::COLOR color) {
     uint index = ((y % InkyImpression7_3f::HEIGHT) * InkyImpression7_3f::WIDTH + (x % InkyImpression7_3f::WIDTH)) / 2;
     if (x & 1) { buffer[index] = (buffer[index] & 0x70) | (color & 0x7); }
@@ -42,23 +38,23 @@ void InkyImpression7_3f::set_pixel(uint x, uint y, InkyImpression7_3f::COLOR col
 #define AC073TC1_POF 0x02
 #define AC073TC1_DTM 0x10
 
-void spi_write(uint32_t dc, const uint8_t *values, size_t len) {
+void InkyImpression7_3f::spi_write(uint32_t dc, const uint8_t *values, size_t len) {
     esp_err_t ret;
     gpio_set_level(static_cast<gpio_num_t>(DISP_PIN_DC), dc);
     spi_transaction_t transaction;
     memset(&transaction, 0, sizeof(transaction));
     transaction.length = len * 8;
     transaction.tx_buffer = values;
-    ret = spi_device_polling_transmit(inky, &transaction);
+    ret = spi_device_polling_transmit(spi, &transaction);
     ESP_ERROR_CHECK(ret);
 
 }
 
-void send_command(uint8_t command) {
+void InkyImpression7_3f::send_command(uint8_t command) {
     spi_write(0, &command, 1);
 }
 
-void send_data(const uint8_t *data, size_t len) {
+void InkyImpression7_3f::send_data(const uint8_t *data, size_t len) {
     spi_write(1, data, len);
 }
 
@@ -82,7 +78,7 @@ void busy_wait(unsigned int timeoutMs) {
     }
 }
 
-void inky_setup() {
+void InkyImpression7_3f::setup() {
 
     gpio_set_level((gpio_num_t) DISP_PIN_RST, 0);
     vTaskDelay(pdMS_TO_TICKS(100));
@@ -172,7 +168,7 @@ void inky_setup() {
     send_data(tsset_data, sizeof(tsset_data));
 }
 
-void hw_update() {
+void InkyImpression7_3f::hw_update() {
     send_command(AC073TC1_PON);
     busy_wait(400);
     DMA_ATTR static const uint8_t zero = 0;
@@ -232,7 +228,7 @@ void InkyImpression7_3f::init_hw() {
     ret = spi_bus_initialize(DISP_SPI_HOST, &buscfg, SPI_DMA_CH_AUTO);
     ESP_ERROR_CHECK(ret);
     //Attach the LCD to the SPI bus
-    ret = spi_bus_add_device(DISP_SPI_HOST, &devcfg, &inky);
+    ret = spi_bus_add_device(DISP_SPI_HOST, &devcfg, &spi);
     ESP_ERROR_CHECK(ret);
 }
 
@@ -241,7 +237,7 @@ void InkyImpression7_3f::init_hw() {
  *
  */
 void InkyImpression7_3f::show() {
-    inky_setup();
+    setup();
 
     send_command(AC073TC1_DTM);
     for (size_t i = 0; i < InkyImpression7_3f::BUF_SIZE; i += 1000)
@@ -256,3 +252,7 @@ void InkyImpression7_3f::set_border(InkyImpression7_3f::COLOR color) {
 void InkyImpression7_3f::set_background(const uint8_t *packet_pixels) {
     memcpy(buffer, packet_pixels, InkyImpression7_3f::BUF_SIZE);
 }
+
+static DMA_ATTR uint8_t bufferA[InkyImpression7_3f::BUF_SIZE];
+
+InkyImpression7_3f::InkyImpression7_3f() : borderColor(BLACK), buffer(bufferA) {}
